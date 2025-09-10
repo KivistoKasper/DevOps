@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  service1:
+    build:
+      context: ./service1
+      dockerfile: dev.Dockerfile
+    container_name: service1
+    ports:
+      - 8199:8199
