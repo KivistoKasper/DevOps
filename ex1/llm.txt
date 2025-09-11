@@ -1,0 +1,4 @@
+Use cases I used LLm in this work
+
+1. Dockerfile and docker-compose.yml files error fixing and getting them to work. 
+copypasted error messages for ChatGPT for help and got them working eventually.

@@ -11,6 +11,10 @@ app.get("/status", async (req, res) => {
   // constructing message
   const msg = `${timestamp}: uptime ${uptimeHours} hours, free disk in root: <X> MBytes`;
 
+  // proxy the message to service 2
+  console.log("Sending to proxy");
+  req.get({ url: "localhost:9191", headers: req.headers });
+  console.log(req);
   // sending and logging
   console.log(msg);
   res.send(`${msg}\n`);

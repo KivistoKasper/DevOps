@@ -18,3 +18,7 @@ services:
     container_name: service2
     networks:
       - service_network
+
+networks:
+  service_network:
+    driver: bridge

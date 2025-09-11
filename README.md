@@ -6,12 +6,19 @@ This is a course work repository.
 
 ## Running in development
 
-To compose up, use:
+### To compose up, use:
 
 docker-compose -f docker-compose.dev.yml up
 
-And to shut down, use:
+### And to shut down, use:
 
 docker-compose -f docker-compose.dev.yml down
 
-Check for running containers: docker ps -a
+### Check for running containers:
+
+docker ps -a
+
+### Prune all
+
+docker-compose down --remove-orphans
+docker system prune -af --volumes
