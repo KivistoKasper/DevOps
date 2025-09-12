@@ -13,6 +13,7 @@
 // for measuring process uptime 
 const auto program_start_time = std::chrono::steady_clock::now();
 
+const int DEBUG = 0;
 #define PORT 9191
 #define BUFFER_SIZE 256
 
@@ -23,10 +24,12 @@ void error(const char *msg){
 
 std::string get_timestamp() {
   const auto now = std::chrono::system_clock::now();
+  const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000; // get millisecods for fun
   auto itt = std::chrono::system_clock::to_time_t(now); // for C time functions
 
   std::ostringstream ss; // output stream
-  ss << std::put_time(gmtime(&itt), "%FT%TZ"); // convert to UTC and format
+  ss << std::put_time(gmtime(&itt), "%FT%T"); // convert to ISO
+  ss << '.' << std::setw(3) << std::setfill('0') << ms.count() << 'Z'; // add milliseconds
   return ss.str();
 }
 
@@ -43,15 +46,16 @@ std::string get_uptime() {
 std::string build_response() {
   std::ostringstream ss;
 
-  ss << get_timestamp()
+  ss << "--SERVICE 2-- "
+     << get_timestamp()
      << ": uptime " << get_uptime()
-     << " hours. free disk in root: <X> MBytes\n";
+     << " hours. free disk in root: <X> MBytes\r\n";
   
   return ss.str();
 }
 
 int main() {
-  std::cout << "Hello from C++ container! Service2!" << std::endl;
+  //std::cout << "Hello from C++ container! Service2!" << std::endl;
 
   
   int server_socket, client_socket, portno;
@@ -105,6 +109,10 @@ int main() {
     if (n < 0) error("Error: can't read message!");
     //printf("Here is the message: %s\n",buffer);
 
+    // DEBUG REQUEST
+    if ( DEBUG == 1){
+      std::cout << buffer << std::endl;
+    }
     // parse message
     std::string request(buffer, n);
     std::size_t first_space = request.find(' ');
@@ -116,10 +124,24 @@ int main() {
 
     //check path and reply
     if ( method == "GET" && path == "/status"){
-      std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\n\n"; // basic response 
+      std::string response =
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: text/plain\r\n"
+        "\r\n";  // End of headers
+ 
       
       // build response
       response += build_response();
+      send(client_socket, response.c_str(), response.length(), 0);
+    }
+    else {
+      std::string response =
+        "HTTP/1.1 501 Not Implemented\r\n"
+        "Content-Type: text/plain\r\n"
+        "Connection: close\r\n"
+        "\r\n"
+        "Not Implemented\r\n";
+
       send(client_socket, response.c_str(), response.length(), 0);
     }
 
