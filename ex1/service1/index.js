@@ -15,6 +15,7 @@ app.get("/status", async (req, res) => {
   console.log("Sending to proxy");
   req.get({ url: "localhost:9191", headers: req.headers });
   console.log(req);
+
   // sending and logging
   console.log(msg);
   res.send(`${msg}\n`);
