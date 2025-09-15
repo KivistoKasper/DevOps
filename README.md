@@ -40,5 +40,5 @@ docker ps -a
 
 ### Prune all
 
-ocker-compose -f docker-compose.dev.yml down --remove-orphans
+docker-compose -f docker-compose.dev.yml down --remove-orphans
 docker system prune -af --volumes
