@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 8199;
 const URL = process.env.URL || "localhost";
 const S2PORT = process.env.S2PORT || 9191;
 
-app.get("/status", async (req, res) => {
+function constructMessage() {
   // needed variables
   const timestamp = new Date(Date.now()).toISOString();
   const uptime = process.uptime() / 3600;
@@ -15,6 +15,10 @@ app.get("/status", async (req, res) => {
 
   // constructing message
   const msg = `--SERVICE 1-- ${timestamp}: uptime ${uptimeHours} hours, free disk in root: <X> MBytes`;
+  return msg;
+}
+
+app.get("/status", async (req, res) => {
   var msg2 = "";
 
   // proxy the message to service 2
@@ -32,6 +36,16 @@ app.get("/status", async (req, res) => {
       console.log("Error: Axios error:", error.message);
     });
 
+  const msg = constructMessage();
+
+  await axios
+    .post("http://localhost:8080/log", { data: msg })
+    .then((res) => {
+      console.log("Writing done");
+    })
+    .catch((error) => {
+      console.log("Error: Axios Write Error ", error);
+    });
   // sending and logging
   if (DEBUG) {
     console.log("service1: ", msg);

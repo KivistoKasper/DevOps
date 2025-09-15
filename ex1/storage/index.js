@@ -3,6 +3,8 @@ const axios = require("axios");
 const fs = require("fs");
 const app = express();
 
+app.use(express.json());
+
 const DEBUG = 1;
 const PORT = process.env.PORT || 8080;
 const FILENAME = "./logs/logs.txt";
@@ -13,8 +15,9 @@ var logStream = fs.createWriteStream(FILENAME, { flags: "a+" });
 app.post("/log", async (req, res) => {
   if (DEBUG) {
     console.log("Updating file...");
+    console.log(req.body);
   }
-  logStream.write("Adding line...\n");
+  logStream.write(`${req.body.data}\n`);
   res.send();
 });
 
