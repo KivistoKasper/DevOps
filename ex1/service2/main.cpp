@@ -13,7 +13,7 @@
 // for measuring process uptime 
 const auto program_start_time = std::chrono::steady_clock::now();
 
-const int DEBUG = 0;
+const int DEBUG = 0; // for extra console output
 #define PORT 9191
 #define BUFFER_SIZE 256
 

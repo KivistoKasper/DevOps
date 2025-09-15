@@ -1,9 +1,11 @@
 const express = require("express");
 const axios = require("axios");
 const app = express();
-const PORT = 8199;
 
 const DEBUG = 1;
+const PORT = process.env.PORT || 8199;
+const URL = process.env.URL || "localhost";
+const S2PORT = process.env.S2PORT || 9191;
 
 app.get("/status", async (req, res) => {
   // needed vriables
@@ -14,21 +16,20 @@ app.get("/status", async (req, res) => {
   // constructing message
   const msg = `--SERVICE 1-- ${timestamp}: uptime ${uptimeHours} hours, free disk in root: <X> MBytes`;
   var msg2 = "";
+
   // proxy the message to service 2
+  const proxyUrl = `http://${URL}:${S2PORT}/status`;
   await axios
-    .get("http://localhost:9191/status", {
+    .get(proxyUrl, {
       headers: {
         Accept: "*/*",
       },
     })
     .then((res) => {
-      if (false) {
-        console.log("service2: ", res.data);
-      }
       msg2 = res.data;
     })
     .catch((error) => {
-      console.log("Error: axios error:", error.message);
+      console.log("Error: Axios error:", error.message);
     });
 
   // sending and logging
