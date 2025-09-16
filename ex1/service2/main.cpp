@@ -9,6 +9,7 @@
 #include <chrono>
 #include <sstream>
 #include <iomanip>
+#include <netdb.h>
 
 // for measuring process uptime 
 const auto program_start_time = std::chrono::steady_clock::now();
@@ -16,6 +17,9 @@ const auto program_start_time = std::chrono::steady_clock::now();
 const int DEBUG = 0; // for extra console output
 #define PORT 9191
 #define BUFFER_SIZE 256
+
+#define storage_host = "http://localhost";
+#define storage_port = 8080;
 
 void error(const char *msg){
   perror(msg);
@@ -49,16 +53,99 @@ std::string build_response() {
   ss << "--SERVICE 2-- "
      << get_timestamp()
      << ": uptime " << get_uptime()
-     << " hours. free disk in root: <X> MBytes\r\n";
+     << " hours. free disk in root: <X> MBytes";
   
   return ss.str();
+}
+// for sending logs
+std::string send_post(const std::string &data) {
+  
+  const char* host = "localhost";
+  const char* port = "8080";
+  const char* path = "/log";
+
+  //std::string::size_type pos = url.find('/');
+  //std::string base_url = url.substr(0, pos);
+  //std::string path = url.substr(pos);
+  if (DEBUG){
+       std::cout << "STORAGE REQUEST DATA: \n" << data << std::endl;
+  }
+  if (data.empty()){
+    error("Error: no data in request");
+    return "Exiting post";
+  }
+  std::string hello = "This is data hello";
+  std::string body = "{\"data\":\"" + data + "\"}";
+  std::string request =
+        "POST " + std::string(path) + " HTTP/1.1\r\n" +
+        "Host: " + host + ":8080\r\n" +
+        "Content-Type: application/json\r\n" +
+        "Content-Length: " + std::to_string(body.length()) + "\r\n" +
+        "Connection: close\r\n\r\n" +
+        body;
+
+  if (DEBUG){
+       std::cout << "STORAGE REQUEST: \n" << request << std::endl;
+  }
+
+  // Get address info
+    struct addrinfo hints{}, *res;
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+  /*
+  if (getaddrinfo(host, port, &hints, &res) != 0) {
+        error("Error: getaddrinfo");
+        return "Exiting post";
+  }
+  */
+  int err = getaddrinfo(host, port, &hints, &res);
+    if (err != 0)
+    {
+        fprintf(stderr, "%s: %s\n", host, gai_strerror(err));
+        abort();
+    }
+
+  // Create socket
+  int sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+  if (sockfd < 0) {
+      error("socket");
+      return "Exiting post";
+  }
+
+  // Connect
+  if (connect(sockfd, res->ai_addr, res->ai_addrlen) < 0) {
+      error("connect");
+      close(sockfd);
+      return "Exiting post";
+  }
+
+  // Send request
+  send(sockfd, request.c_str(), request.length(), 0);
+
+  // Read and print response
+  char buffer[BUFFER_SIZE];
+  ssize_t bytesReceived;
+  while ((bytesReceived = recv(sockfd, buffer, sizeof(buffer) - 1, 0)) > 0) {
+      buffer[bytesReceived] = '\0';
+      if(DEBUG){
+        std::cout << "STORAGE RESPONSE: "  << std::endl;
+        std::cout << buffer;
+      }
+  }
+
+  // Clean up
+  close(sockfd);
+  freeaddrinfo(res);
+
+  return "all done";
 }
 
 int main() {
   //std::cout << "Hello from C++ container! Service2!" << std::endl;
 
-  
-  int server_socket, client_socket, portno;
+  // listening service1
+  int server_socket, client_socket;
   socklen_t clilen;
   char buffer[BUFFER_SIZE];
   struct sockaddr_in serv_addr, cli_addr;
@@ -69,6 +156,8 @@ int main() {
   if (server_socket < 0){
     error("Error: Can't open socket!");
   }
+
+  //
 
   // Prepare the server address
   
@@ -89,7 +178,7 @@ int main() {
       return 1;
   }
 
-  std::cout << "Server is listening on port " << PORT << std::endl;
+  std::cout << "Service2 running on port: " << PORT << std::endl;
 
   clilen = sizeof(cli_addr);
 
@@ -111,7 +200,7 @@ int main() {
 
     // DEBUG REQUEST
     if ( DEBUG == 1){
-      std::cout << buffer << std::endl;
+      std::cout << "Buffer: " << buffer << std::endl;
     }
     // parse message
     std::string request(buffer, n);
@@ -120,18 +209,24 @@ int main() {
     std::size_t second_space = request.find(' ', first_space + 1);
     std::string path = request.substr(first_space + 1, second_space - first_space - 1);
 
-    std::cout << "Request " << method << " to " << path << std::endl;
+    if(!DEBUG){
+      std::cout << "Request " << method << " to " << path << std::endl;
+    }
 
     //check path and reply
     if ( method == "GET" && path == "/status"){
+
+      // build response
       std::string response =
         "HTTP/1.1 200 OK\r\n"
         "Content-Type: text/plain\r\n"
         "\r\n";  // End of headers
- 
-      
-      // build response
-      response += build_response();
+      std::string time_stamp = build_response();
+      response += time_stamp + "\r\n";
+
+      // log the response
+      std::string post_res = send_post(time_stamp);
+
       send(client_socket, response.c_str(), response.length(), 0);
     }
     else {

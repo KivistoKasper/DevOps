@@ -38,10 +38,11 @@ app.get("/status", async (req, res) => {
 
   const msg = constructMessage();
 
+  // proxy the status to storage
   await axios
     .post("http://localhost:8080/log", { data: msg })
     .then((res) => {
-      console.log("Writing done");
+      //console.log("Writing done");
     })
     .catch((error) => {
       console.log("Error: Axios Write Error ", error);
@@ -52,7 +53,7 @@ app.get("/status", async (req, res) => {
     console.log("service2: ", msg2);
   }
 
-  res.send(`${msg}\n${msg2}`);
+  res.type("text/plain").send(`${msg}\n${msg2}`);
 });
 
 app.get("/log", async (req, res) => {

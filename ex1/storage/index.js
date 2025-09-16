@@ -14,8 +14,8 @@ var logStream = fs.createWriteStream(FILENAME, { flags: "a+" });
 
 app.post("/log", async (req, res) => {
   if (DEBUG) {
-    console.log("Updating file...");
-    console.log(req.body);
+    console.log("Updating file: ", FILENAME);
+    console.log(req.body.data);
   }
   logStream.write(`${req.body.data}\n`);
   res.send();
