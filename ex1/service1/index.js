@@ -2,6 +2,12 @@ const express = require("express");
 const axios = require("axios");
 const app = express();
 const disk = require("diskusage");
+const fs = require("fs");
+/*
+- type: bind
+        source: ./storage/logs
+        target: /usr/src/storage/logs
+*/
 
 const DEBUG = 1;
 const PORT = process.env.PORT || 8199;
@@ -9,6 +15,7 @@ const S2_URL = process.env.S2_URL || "localhost";
 const S2_PORT = process.env.S2_PORT || 9191;
 const STORAGE_URL = process.env.STORAGE_URL || "localhost";
 const STORAGE_PORT = process.env.STORAGE_PORT || 8080;
+const FILENAME = "../vStorage";
 
 const S2proxyUrl = `http://${S2_URL}:${S2_PORT}/status`;
 const storageProxyUrl = `http://${STORAGE_URL}:${STORAGE_PORT}/log`;
@@ -31,10 +38,37 @@ function constructMessage() {
   }
 }
 
-app.get("/status", async (req, res) => {
-  var msg2 = "";
+// function to write logs to vStorage
+function writeToVStorage(msg) {
+  // logging stream
+  var logStream = fs.createWriteStream(FILENAME, { flags: "a" });
+  logStream.on("error", (err) => {
+    console.error("Error: Failed to access vStrorage: ", err);
+  });
 
-  // proxy the message to service 2
+  console.log("Writing vStorage...");
+  logStream.write(`${msg}\n`);
+}
+
+app.get("/status", async (req, res) => {
+  // 1. analyze status
+  var msg2 = "";
+  const msg = constructMessage();
+
+  // 2. proxy the status to storage
+  await axios
+    .post(storageProxyUrl, { data: msg })
+    .then((res) => {
+      //console.log("Writing done");
+    })
+    .catch((error) => {
+      console.log("Error: Axios Write Error ", error);
+    });
+
+  // 3. write to vStorage
+  writeToVStorage(msg);
+
+  // 4. proxy the message to service 2
   await axios
     .get(S2proxyUrl, {
       headers: {
@@ -48,23 +82,12 @@ app.get("/status", async (req, res) => {
       console.log("Error: Axios Service 2 error:", error.message);
     });
 
-  const msg = constructMessage();
-
-  // proxy the status to storage
-  await axios
-    .post(storageProxyUrl, { data: msg })
-    .then((res) => {
-      //console.log("Writing done");
-    })
-    .catch((error) => {
-      console.log("Error: Axios Write Error ", error);
-    });
-  // sending and logging
+  // debug messages
   if (DEBUG) {
     console.log("service1: ", msg);
     console.log("service2: ", msg2);
   }
-
+  // 9. Combine outputs and return response
   res.type("text/plain").send(`${msg}\n${msg2}`);
 });
 

@@ -7,16 +7,19 @@ app.use(express.json());
 
 const DEBUG = 1;
 const PORT = process.env.PORT || 8080;
-const FILENAME = "./logs/logs.txt";
+const FILENAME = "/data/logs.txt";
 
 // logging stream
-var logStream = fs.createWriteStream(FILENAME, { flags: "a+" });
+var logStream = fs.createWriteStream(FILENAME, { flags: "a" });
+logStream.on("error", (err) => {
+  console.error("Error: Failed to access file: ", err);
+});
 
 app.post("/log", async (req, res) => {
   if (DEBUG) {
     console.log("Updating file: ", FILENAME);
     console.log(req.body.data);
-    logStream.write(`Debugging\n`);
+    //logStream.write(`Debugging\n`);
   }
   console.log("Writing file...");
   logStream.write(`${req.body.data}\n`);
@@ -31,7 +34,7 @@ app.get("/log", async (req, res) => {
   // read file and respond
   fs.readFile(FILENAME, "utf-8", function (err, data) {
     if (err) {
-      console.log("Error reading storage: ", err);
+      console.error("Error reading storage: ", err);
       res.status(404).send("Error: File not found");
       return; // do this better
     }

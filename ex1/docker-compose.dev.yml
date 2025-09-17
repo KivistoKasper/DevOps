@@ -10,6 +10,10 @@ services:
       - 8199:8199
     networks:
       - service_network
+    volumes:
+      - type: bind
+        source: ./vStorage
+        target: /usr/src/vStorage
     environment:
       - PORT=8199
       - S2_URL=service2
@@ -37,12 +41,13 @@ services:
     networks:
       - service_network
     volumes:
-      - type: bind
-        source: ./storage/logs
-        target: /usr/src/storage/logs
+      - storage-volume:/data
     environment:
       - PORT=8080
 
 networks:
   service_network:
     driver: bridge
+
+volumes:
+  storage-volume:

@@ -1,4 +1,4 @@
-FROM node
+FROM node:20
 
 WORKDIR /usr/src/storage
 
@@ -10,6 +10,6 @@ RUN npm install
 
 COPY . .
 
-USER node
+USER root
 
-CMD ["npm", "run", "dev"]
+CMD ["sh", "-c", "chown -R node:node /data && npm run dev"]
