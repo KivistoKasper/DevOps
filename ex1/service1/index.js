@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const app = express();
+const disk = require("diskusage");
 
 const DEBUG = 1;
 const PORT = process.env.PORT || 8199;
@@ -15,13 +16,19 @@ console.log(`WHOLE URLS: \n${S2proxyUrl}\n${storageProxyUrl}`);
 
 function constructMessage() {
   // needed variables
-  const timestamp = new Date(Date.now()).toISOString();
-  const uptime = process.uptime() / 3600;
-  const uptimeHours = Math.round(uptime * 10) / 10;
+  try {
+    const timestamp = new Date(Date.now()).toISOString();
+    const uptime = process.uptime() / 3600;
+    const uptimeHours = Math.round(uptime * 10) / 10;
+    const { available, free, total } = disk.checkSync("/");
+    const freeDiskMB = Math.floor(free / (1024 * 1024));
 
-  // constructing message
-  const msg = `--SERVICE 1-- ${timestamp}: uptime ${uptimeHours} hours, free disk in root: <X> MBytes`;
-  return msg;
+    // constructing message
+    const msg = `--SERVICE 1-- ${timestamp}: uptime ${uptimeHours} hours, free disk in root: ${freeDiskMB} MBytes`;
+    return msg;
+  } catch (err) {
+    console.log("Error: error on message variables.");
+  }
 }
 
 app.get("/status", async (req, res) => {

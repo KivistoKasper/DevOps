@@ -6,11 +6,13 @@
 #include <unistd.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
+
 #include <netinet/in.h>
 #include <chrono>
 #include <sstream>
 #include <iomanip>
 #include <netdb.h>
+#include <filesystem>
 
 // for measuring process uptime 
 const auto program_start_time = std::chrono::steady_clock::now();
@@ -49,13 +51,19 @@ std::string get_uptime() {
   return ss.str();
 }
 
+std::string get_free_disk() {
+  std::filesystem::space_info disk_info = std::filesystem::space("/");
+  return std::to_string(disk_info.available / (1024  * 1024)); // return in MB
+}
+
 std::string build_response() {
   std::ostringstream ss;
 
   ss << "--SERVICE 2-- "
      << get_timestamp()
      << ": uptime " << get_uptime()
-     << " hours. free disk in root: <X> MBytes";
+     << " hours. free disk in root: " << get_free_disk()
+     << " MBytes";
   
   return ss.str();
 }
