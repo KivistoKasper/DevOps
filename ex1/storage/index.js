@@ -16,7 +16,9 @@ app.post("/log", async (req, res) => {
   if (DEBUG) {
     console.log("Updating file: ", FILENAME);
     console.log(req.body.data);
+    logStream.write(`Debugging\n`);
   }
+  console.log("Writing file...");
   logStream.write(`${req.body.data}\n`);
   res.send();
 });

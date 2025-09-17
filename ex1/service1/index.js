@@ -4,13 +4,14 @@ const app = express();
 
 const DEBUG = 1;
 const PORT = process.env.PORT || 8199;
-const S2_URL = process.env.URL || "localhost";
-const S2_PORT = process.env.S2PORT || 9191;
-const STORAGE_URL = process.env.URL || "localhost";
-const STORAGE_PORT = process.env.S2PORT || 8080;
+const S2_URL = process.env.S2_URL || "localhost";
+const S2_PORT = process.env.S2_PORT || 9191;
+const STORAGE_URL = process.env.STORAGE_URL || "localhost";
+const STORAGE_PORT = process.env.STORAGE_PORT || 8080;
 
 const S2proxyUrl = `http://${S2_URL}:${S2_PORT}/status`;
 const storageProxyUrl = `http://${STORAGE_URL}:${STORAGE_PORT}/log`;
+console.log(`WHOLE URLS: \n${S2proxyUrl}\n${storageProxyUrl}`);
 
 function constructMessage() {
   // needed variables
@@ -37,7 +38,7 @@ app.get("/status", async (req, res) => {
       msg2 = res.data;
     })
     .catch((error) => {
-      console.log("Error: Axios error:", error.message);
+      console.log("Error: Axios Service 2 error:", error.message);
     });
 
   const msg = constructMessage();
@@ -70,7 +71,7 @@ app.get("/log", async (req, res) => {
       logs = res.data;
     })
     .catch((error) => {
-      console.log("Error: Axios error:", error.message);
+      console.log("Error: Axios Get Log error:", error.message);
     });
 
   res.send(logs);

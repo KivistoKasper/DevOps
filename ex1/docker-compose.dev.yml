@@ -26,6 +26,8 @@ services:
       - service_network
     environment:
       - PORT=9191
+      - STORAGE_URL=storage
+      - STORAGE_PORT=8080
 
   storage:
     build:
@@ -34,6 +36,10 @@ services:
     container_name: storage
     networks:
       - service_network
+    volumes:
+      - type: bind
+        source: ./storage/logs
+        target: /usr/src/storage/logs
     environment:
       - PORT=8080
 

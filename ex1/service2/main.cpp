@@ -15,7 +15,7 @@
 // for measuring process uptime 
 const auto program_start_time = std::chrono::steady_clock::now();
 
-const int DEBUG = 0; // for extra console output
+const int DEBUG = 1; // for extra console output
 #define BUFFER_SIZE 256
 // setting env vars
 const char* STR_PORT = std::getenv("PORT"); // convert this to int
@@ -111,13 +111,13 @@ std::string send_post(const std::string &data) {
   // Create socket
   int sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
   if (sockfd < 0) {
-      error("socket");
+      error("Error: error creating socket");
       return "Exiting post";
   }
 
   // Connect
   if (connect(sockfd, res->ai_addr, res->ai_addrlen) < 0) {
-      error("connect");
+      error("Error: error connecting to socket ");
       close(sockfd);
       return "Exiting post";
   }
@@ -145,6 +145,10 @@ std::string send_post(const std::string &data) {
 
 int main() {
   //std::cout << "Hello from C++ container! Service2!" << std::endl;
+  if (DEBUG){
+    std::cout << "VARIABLES: \n" << STORAGE_URL << std::endl;
+    std::cout << STORAGE_PORT << std::endl;
+  }
 
   // listening service1
   int server_socket, client_socket;
