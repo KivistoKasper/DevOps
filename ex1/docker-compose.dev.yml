@@ -28,6 +28,10 @@ services:
     container_name: service2
     networks:
       - service_network
+    volumes:
+      - type: bind
+        source: ./vStorage
+        target: /usr/src/vStorage
     environment:
       - PORT=9191
       - STORAGE_URL=storage

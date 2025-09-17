@@ -10,6 +10,8 @@ RUN npm install
 
 COPY . .
 
+# Need root access to create file to docker volume
+# TODO: Find better way
 USER root
 
 CMD ["sh", "-c", "chown -R node:node /data && npm run dev"]

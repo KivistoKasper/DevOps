@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
-
+#include <fstream>
 #include <netinet/in.h>
 #include <chrono>
 #include <sstream>
@@ -30,6 +30,14 @@ void error(const char *msg){
   exit(1);
 }
 
+void clg(const char *msg){
+  std::cout << msg << std::endl;
+  return;
+}
+
+/**
+ * Function to create timestamp
+ */
 std::string get_timestamp() {
   const auto now = std::chrono::system_clock::now();
   const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000; // get millisecods for fun
@@ -41,6 +49,9 @@ std::string get_timestamp() {
   return ss.str();
 }
 
+/**
+ * Function to get current uptime
+ */
 std::string get_uptime() {
   auto now = std::chrono::steady_clock::now();
   auto elapsed = now - program_start_time;
@@ -51,24 +62,48 @@ std::string get_uptime() {
   return ss.str();
 }
 
+/**
+ * Function to get current free disk space
+ */
 std::string get_free_disk() {
   std::filesystem::space_info disk_info = std::filesystem::space("/");
   return std::to_string(disk_info.available / (1024  * 1024)); // return in MB
 }
 
+/**
+ * Function to build the record message
+ */
 std::string build_response() {
   std::ostringstream ss;
-
   ss << "--SERVICE 2-- "
      << get_timestamp()
      << ": uptime " << get_uptime()
-     << " hours. free disk in root: " << get_free_disk()
+     << " hours, free disk in root: " << get_free_disk()
      << " MBytes";
-  
   return ss.str();
 }
-// for sending logs
-std::string send_post(const std::string &data) {
+
+void send_to_vStorage(const std::string &msg) {
+  std::ofstream vStorage;
+  clg("Opening file...");
+  vStorage.open("/usr/src/vStorage", std::ios::app);
+  if ( vStorage.is_open()){
+    clg("Writing vStorage");
+    clg(msg.c_str());
+    vStorage << msg << "\n";
+    vStorage.close();
+    clg("done");
+  }
+  else {
+    error("Error: error opening vStorage");
+  }
+  return;
+}
+
+/**
+ * Function to send record message to storage service
+ */
+std::string send_to_storage(const std::string &data) {
   
   //const char* STORAGE_URL = "storage";
   //const char* STORAGE_PORT = "8080";
@@ -147,18 +182,19 @@ std::string send_post(const std::string &data) {
   // Clean up
   close(sockfd);
   freeaddrinfo(res);
-
   return "all done";
 }
 
+/**
+ * Main function, listens to coming requests 
+ */
 int main() {
-  //std::cout << "Hello from C++ container! Service2!" << std::endl;
   if (DEBUG){
     std::cout << "VARIABLES: \n" << STORAGE_URL << std::endl;
     std::cout << STORAGE_PORT << std::endl;
   }
 
-  // listening service1
+  // sockets and adresses
   int server_socket, client_socket;
   socklen_t clilen;
   char buffer[BUFFER_SIZE];
@@ -171,10 +207,7 @@ int main() {
     error("Error: Can't open socket!");
   }
 
-  //
-
   // Prepare the server address
-  
   bzero((char *) &serv_addr, sizeof(serv_addr)); // clear address struct
   serv_addr.sin_family = AF_INET; // server byte order
   serv_addr.sin_addr.s_addr = INADDR_ANY; // fill current host addr
@@ -193,9 +226,9 @@ int main() {
   }
 
   std::cout << "Service2 running on port: " << PORT << std::endl;
-
   clilen = sizeof(cli_addr);
 
+  // handle requests
   while(true){
     //accept incoming 
     client_socket = accept(server_socket, (sockaddr*)&cli_addr, &clilen);
@@ -207,10 +240,8 @@ int main() {
     // HTTP message
     // clear buffer
     bzero(buffer,256);
-
     n = read(client_socket,buffer,255);
     if (n < 0) error("Error: can't read message!");
-    //printf("Here is the message: %s\n",buffer);
 
     // DEBUG REQUEST
     if ( DEBUG == 1){
@@ -223,24 +254,29 @@ int main() {
     std::size_t second_space = request.find(' ', first_space + 1);
     std::string path = request.substr(first_space + 1, second_space - first_space - 1);
 
+    // Console info
     if(!DEBUG){
       std::cout << "Request " << method << " to " << path << std::endl;
     }
 
-    //check path and reply
+    //check method and path 
     if ( method == "GET" && path == "/status"){
-
       // build response
       std::string response =
         "HTTP/1.1 200 OK\r\n"
         "Content-Type: text/plain\r\n"
         "\r\n";  // End of headers
-      std::string time_stamp = build_response();
-      response += time_stamp + "\r\n";
+      // 5. analyze status and create record
+      std::string record = build_response();
+      response += record + "\r\n";
 
-      // log the response
-      std::string post_res = send_post(time_stamp);
+      // 6. log the response with storage service
+      std::string post_res = send_to_storage(record);
 
+      // 7. log the record to vStorage
+      send_to_vStorage(record);
+
+      // 8. send the record as a response
       send(client_socket, response.c_str(), response.length(), 0);
     }
     else {
@@ -253,9 +289,7 @@ int main() {
 
       send(client_socket, response.c_str(), response.length(), 0);
     }
-
     close(client_socket);
-
   }
   close(server_socket);
   return 0;

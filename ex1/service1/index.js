@@ -48,6 +48,7 @@ function writeToVStorage(msg) {
 
   console.log("Writing vStorage...");
   logStream.write(`${msg}\n`);
+  logStream.end();
 }
 
 app.get("/status", async (req, res) => {
