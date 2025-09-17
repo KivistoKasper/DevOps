@@ -4,8 +4,13 @@ const app = express();
 
 const DEBUG = 1;
 const PORT = process.env.PORT || 8199;
-const URL = process.env.URL || "localhost";
-const S2PORT = process.env.S2PORT || 9191;
+const S2_URL = process.env.URL || "localhost";
+const S2_PORT = process.env.S2PORT || 9191;
+const STORAGE_URL = process.env.URL || "localhost";
+const STORAGE_PORT = process.env.S2PORT || 8080;
+
+const S2proxyUrl = `http://${S2_URL}:${S2_PORT}/status`;
+const storageProxyUrl = `http://${STORAGE_URL}:${STORAGE_PORT}/log`;
 
 function constructMessage() {
   // needed variables
@@ -22,9 +27,8 @@ app.get("/status", async (req, res) => {
   var msg2 = "";
 
   // proxy the message to service 2
-  const proxyUrl = `http://${URL}:${S2PORT}/status`;
   await axios
-    .get(proxyUrl, {
+    .get(S2proxyUrl, {
       headers: {
         Accept: "*/*",
       },
@@ -40,7 +44,7 @@ app.get("/status", async (req, res) => {
 
   // proxy the status to storage
   await axios
-    .post("http://localhost:8080/log", { data: msg })
+    .post(storageProxyUrl, { data: msg })
     .then((res) => {
       //console.log("Writing done");
     })
@@ -60,7 +64,7 @@ app.get("/log", async (req, res) => {
   var logs = "";
   // proxy the request to storage
   await axios
-    .get("http://localhost:8080/log")
+    .get(storageProxyUrl)
     .then((res) => {
       //console.log("Message from storgae: ", res.data);
       logs = res.data;

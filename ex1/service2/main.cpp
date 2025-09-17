@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cstdlib> 
 #include <unistd.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
@@ -15,11 +16,12 @@
 const auto program_start_time = std::chrono::steady_clock::now();
 
 const int DEBUG = 0; // for extra console output
-#define PORT 9191
 #define BUFFER_SIZE 256
-
-#define storage_host = "http://localhost";
-#define storage_port = 8080;
+// setting env vars
+const char* STR_PORT = std::getenv("PORT"); // convert this to int
+const int PORT = STR_PORT ? std::atoi(STR_PORT) : 9191;
+const char* STORAGE_URL = std::getenv("STORAGE_URL") ? std::getenv("STORAGE_URL") : "localhost";
+const char* STORAGE_PORT = std::getenv("STORAGE_PORT") ? std::getenv("STORAGE_PORT") : "8080";
 
 void error(const char *msg){
   perror(msg);
@@ -60,8 +62,8 @@ std::string build_response() {
 // for sending logs
 std::string send_post(const std::string &data) {
   
-  const char* host = "localhost";
-  const char* port = "8080";
+  //const char* STORAGE_URL = "storage";
+  //const char* STORAGE_PORT = "8080";
   const char* path = "/log";
 
   //std::string::size_type pos = url.find('/');
@@ -78,7 +80,7 @@ std::string send_post(const std::string &data) {
   std::string body = "{\"data\":\"" + data + "\"}";
   std::string request =
         "POST " + std::string(path) + " HTTP/1.1\r\n" +
-        "Host: " + host + ":8080\r\n" +
+        "Host: " + STORAGE_URL + ":8080\r\n" +
         "Content-Type: application/json\r\n" +
         "Content-Length: " + std::to_string(body.length()) + "\r\n" +
         "Connection: close\r\n\r\n" +
@@ -99,10 +101,10 @@ std::string send_post(const std::string &data) {
         return "Exiting post";
   }
   */
-  int err = getaddrinfo(host, port, &hints, &res);
+  int err = getaddrinfo(STORAGE_URL, STORAGE_PORT, &hints, &res);
     if (err != 0)
     {
-        fprintf(stderr, "%s: %s\n", host, gai_strerror(err));
+        fprintf(stderr, "%s: %s\n", STORAGE_URL, gai_strerror(err));
         abort();
     }
 

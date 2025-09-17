@@ -12,9 +12,11 @@ services:
       - service_network
     environment:
       - PORT=8199
-      - URL=service2
-      - S2PORT=9191
-  
+      - S2_URL=service2
+      - S2_PORT=9191
+      - STORAGE_URL=storage
+      - STORAGE_PORT=8080
+
   service2:
     build:
       context: ./service2
@@ -24,6 +26,16 @@ services:
       - service_network
     environment:
       - PORT=9191
+
+  storage:
+    build:
+      context: ./storage
+      dockerfile: Dockerfile
+    container_name: storage
+    networks:
+      - service_network
+    environment:
+      - PORT=8080
 
 networks:
   service_network:
