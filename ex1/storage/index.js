@@ -5,7 +5,7 @@ const app = express();
 
 app.use(express.json());
 
-const DEBUG = 1;
+const DEBUG = 0;
 const PORT = process.env.PORT || 8080;
 const FILENAME = "/data/logs.txt";
 

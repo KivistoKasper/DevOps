@@ -1,4 +1,12 @@
+Used tool: ChatGPT
+
+Motivation to use LLM: The main motivation for using LLM in this assignment was to speed up some of the processes eg. error or bug fixing. The time it takes for LLM to guide me to the right direction from error message is just so much faster that manually reading the error message. 
+
 Use cases I used LLm in this work
 
 1. Dockerfile and docker-compose.yml files error fixing and getting them to work. 
 copypasted error messages for ChatGPT for help and got them working eventually.
+
+2. Help with linux commands eg. permission changes.
+
+3. Better understanding of errors and error codes. Help fixing those errors.

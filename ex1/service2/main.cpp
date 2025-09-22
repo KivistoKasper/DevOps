@@ -17,7 +17,7 @@
 // for measuring process uptime 
 const auto program_start_time = std::chrono::steady_clock::now();
 
-const int DEBUG = 1; // for extra console output
+const int DEBUG = 0; // for extra console output
 #define BUFFER_SIZE 256
 // setting env vars
 const char* STR_PORT = std::getenv("PORT"); // convert this to int
@@ -83,6 +83,9 @@ std::string build_response() {
   return ss.str();
 }
 
+/**
+ * Function to write log to vStorage
+ */
 void send_to_vStorage(const std::string &msg) {
   std::ofstream vStorage;
   clg("Opening file...");
@@ -104,14 +107,8 @@ void send_to_vStorage(const std::string &msg) {
  * Function to send record message to storage service
  */
 std::string send_to_storage(const std::string &data) {
-  
-  //const char* STORAGE_URL = "storage";
-  //const char* STORAGE_PORT = "8080";
   const char* path = "/log";
 
-  //std::string::size_type pos = url.find('/');
-  //std::string base_url = url.substr(0, pos);
-  //std::string path = url.substr(pos);
   if (DEBUG){
        std::cout << "STORAGE REQUEST DATA: \n" << data << std::endl;
   }

@@ -3,13 +3,8 @@ const axios = require("axios");
 const app = express();
 const disk = require("diskusage");
 const fs = require("fs");
-/*
-- type: bind
-        source: ./storage/logs
-        target: /usr/src/storage/logs
-*/
 
-const DEBUG = 1;
+const DEBUG = 0;
 const PORT = process.env.PORT || 8199;
 const S2_URL = process.env.S2_URL || "localhost";
 const S2_PORT = process.env.S2_PORT || 9191;
@@ -53,8 +48,8 @@ function writeToVStorage(msg) {
 
 app.get("/status", async (req, res) => {
   // 1. analyze status
-  var msg2 = "";
   const msg = constructMessage();
+  var msg2 = "";
 
   // 2. proxy the status to storage
   await axios

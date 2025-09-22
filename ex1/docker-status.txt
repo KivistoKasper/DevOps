@@ -1,0 +1,16 @@
+docker container ls
+----------------------
+CONTAINER ID   IMAGE          COMMAND                  CREATED              STATUS              PORTS                                       NAMES
+9e465457f306   ex1_storage    "docker-entrypoint.s…"   About a minute ago   Up About a minute                                               storage
+1cde075a967e   ex1_service2   "/main"                  About a minute ago   Up About a minute                                               service2
+71f9f010b18d   ex1_service1   "docker-entrypoint.s…"   About a minute ago   Up About a minute   0.0.0.0:8199->8199/tcp, :::8199->8199/tcp   service1
+----------------------
+
+docker network ls
+----------------------
+NETWORK ID     NAME                  DRIVER    SCOPE
+f2c88aa2dfcb   bridge                bridge    local
+1978d8c94935   ex1_service_network   bridge    local
+1d429863a261   host                  host      local
+a2e078fcea80   none                  null      local
+----------------------
