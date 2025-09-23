@@ -1,12 +1,29 @@
-Used tool: ChatGPT
+Used tool: 
 
-Motivation to use LLM: The main motivation for using LLM in this assignment was to speed up some of the processes eg. error or bug fixing. The time it takes for LLM to guide me to the right direction from error message is just so much faster that manually reading the error message. 
+ChatGPT
 
-Use cases I used LLm in this work
+Motivation to use LLM: 
 
+The main motivation for using LLM in this assignment was to speed up some of the processes eg. error or bug fixing. The time it takes for LLM to guide me to the right direction from error message is much faster than manually searching for the error code meaning. 
+
+How and why LLM helped: 
+
+LLM helped most when errors or something unexpected happened. In writing the code the LLM didn't prove too much of a help but small things like formatting strings or converting variables right were easy to give LLM to handle. There were times when I knew what I wanted to do but could not remember the function or method name to do the thing. In these times asking LLM was a quick way to get the wanted name of the function or method so I could get back to the important job at hand. 
+
+The most useful usecases for LLM in this project:
 1. Dockerfile and docker-compose.yml files error fixing and getting them to work. 
 copypasted error messages for ChatGPT for help and got them working eventually.
-
 2. Help with linux commands eg. permission changes.
-
 3. Better understanding of errors and error codes. Help fixing those errors.
+
+What kind of mistakes LLM did:
+
+Sometimes the answer was not correct. For example the function I was looking for was from different library I wanted to use or the Dockerfile suggestions were a little off. Most of the time the help of LLM was genuine and helped me forward, but as this was quite a simple project that was to be expected. In larger more complicated projects the help of a LLM will not be as significant, but can still be helpful in smaller parts. 
+
+What were things that LLM was not able to provide:
+
+Dockerfiles were sometimes a bit off, but a great place to start. Sometimes the errors I whould ask about were not understood by the LLM and the answer not helpful. Larger code blocks were not as usable as smaller ones. 
+
+
+
+

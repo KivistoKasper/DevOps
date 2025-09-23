@@ -88,14 +88,14 @@ std::string build_response() {
  */
 void send_to_vStorage(const std::string &msg) {
   std::ofstream vStorage;
-  clg("Opening file...");
+  //clg("Opening file...");
   vStorage.open("/usr/src/vStorage", std::ios::app);
   if ( vStorage.is_open()){
     clg("Writing vStorage");
-    clg(msg.c_str());
+    //clg(msg.c_str());
     vStorage << msg << "\n";
     vStorage.close();
-    clg("done");
+    //clg("done");
   }
   else {
     error("Error: error opening vStorage");
@@ -110,7 +110,7 @@ std::string send_to_storage(const std::string &data) {
   const char* path = "/log";
 
   if (DEBUG){
-       std::cout << "STORAGE REQUEST DATA: \n" << data << std::endl;
+    clg("STORAGE REQUEST DATA: ");
   }
   if (data.empty()){
     error("Error: no data in request");
@@ -127,7 +127,7 @@ std::string send_to_storage(const std::string &data) {
         body;
 
   if (DEBUG){
-       std::cout << "STORAGE REQUEST: \n" << request << std::endl;
+    clg("STORAGE REQUEST: ");
   }
 
   // Get address info

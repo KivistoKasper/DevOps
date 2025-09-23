@@ -1,7 +1,8 @@
 # Stage 1: Build stage
-FROM ubuntu:22.04 AS build
+FROM alpine:3.22 AS build
 
-RUN apt-get update && apt-get install -y build-essential
+#RUN apt-get update && apt-get install -y build-essential
+RUN apk add --no-cache g++ musl-dev
 
 WORKDIR /usr/src/service2
 

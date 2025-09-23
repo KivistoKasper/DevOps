@@ -14,7 +14,7 @@ const FILENAME = "../vStorage";
 
 const S2proxyUrl = `http://${S2_URL}:${S2_PORT}/status`;
 const storageProxyUrl = `http://${STORAGE_URL}:${STORAGE_PORT}/log`;
-console.log(`WHOLE URLS: \n${S2proxyUrl}\n${storageProxyUrl}`);
+//console.log(`WHOLE URLS: \n${S2proxyUrl}\n${storageProxyUrl}`);
 
 function constructMessage() {
   // needed variables
@@ -47,6 +47,7 @@ function writeToVStorage(msg) {
 }
 
 app.get("/status", async (req, res) => {
+  console.log(`Request GET to /status`);
   // 1. analyze status
   const msg = constructMessage();
   var msg2 = "";
@@ -79,15 +80,14 @@ app.get("/status", async (req, res) => {
     });
 
   // debug messages
-  if (DEBUG) {
-    console.log("service1: ", msg);
-    console.log("service2: ", msg2);
-  }
+  console.log(`${msg}\n${msg2}`);
+
   // 9. Combine outputs and return response
   res.type("text/plain").send(`${msg}\n${msg2}`);
 });
 
 app.get("/log", async (req, res) => {
+  console.log(`Request GET to /log`);
   var logs = "";
   // proxy the request to storage
   await axios

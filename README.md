@@ -60,10 +60,11 @@ The Docker volume implementation with a separate service was the better solution
 
 For course staff to test the system use the following instructions from the exercise document
 
-1. `git clone -b exercise1 https://github.com/KivistoKasper/DevOps.git`
-2. `docker-compose up --build`
-3. `curl localhost:8199/status`
-4. `docker-compose down`
+1. `git clone -b exercise1 git@github.com:KivistoKasper/DevOps.git`
+2. `cd DevOps/ex1/`
+3. `docker-compose up --build`
+4. `curl localhost:8199/status`
+5. `docker-compose down`
 
 Instructions for clearing up after testing the project.
 
