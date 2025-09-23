@@ -60,7 +60,7 @@ The Docker volume implementation with a separate service was the better solution
 
 For course staff to test the system use the following instructions from the exercise document
 
-1. `git clone -b exercise1 git@github.com:KivistoKasper/DevOps.git`
+1. `git clone -b exercise1 https://github.com/KivistoKasper/DevOps.git`
 2. `cd DevOps/ex1/`
 3. `docker-compose up --build`
 
@@ -73,9 +73,9 @@ Instructions for clearing up after testing the project.
 
 **Delete only containers of this project and leave node and alpine**
 
-1. Remove the docker volume `docker volume rm ex1_storage-volume`
-2. Remove services `docker image rm ex1_storage ex1_service1 ex1_service2`
-3. (Optional) Clear the vStorage attached to host `echo -n "" > vStorage`
+1. Remove the docker volume: `docker volume rm ex1_storage-volume`
+2. Remove services: `docker image rm ex1_storage ex1_service1 ex1_service2`
+3. (Optional) Clear the vStorage attached to host: `echo -n "" > vStorage`
 
 **Remove all docker containder, volumes, networks and images**
 
