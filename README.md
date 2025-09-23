@@ -63,14 +63,23 @@ For course staff to test the system use the following instructions from the exer
 1. `git clone -b exercise1 git@github.com:KivistoKasper/DevOps.git`
 2. `cd DevOps/ex1/`
 3. `docker-compose up --build`
+
+The building of images can take couple minutes depending on internet conection, processing power and if the needed images are downloaded prehand.
+
 4. `curl localhost:8199/status`
 5. `docker-compose down`
 
 Instructions for clearing up after testing the project.
 
+**Delete only containers of this project and leave node and alpine**
+
 1. Remove the docker volume `docker volume rm ex1_storage-volume`
-2. Clear the vStorage attached to host `echo -n "" > vStorage`
-3. Remove all docker containder, volumes, networks and images `docker system prune -a --volumes`
+2. Remove services `docker image rm ex1_storage ex1_service1 ex1_service2`
+3. (Optional) Clear the vStorage attached to host `echo -n "" > vStorage`
+
+**Remove all docker containder, volumes, networks and images**
+
+`docker system prune -a --volumes`
 
 After these the directory can be deleted.
 
